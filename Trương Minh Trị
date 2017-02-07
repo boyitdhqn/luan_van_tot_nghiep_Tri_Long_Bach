@@ -47,3 +47,67 @@ Phương pháp lập trình hướng khía cạnh có nhiều ưu điểm kể t
 •	Khi chúng ta mắc sai lầm trong việc diễn đạt thực thi cắt ngang có thể gây lỗi tràn ngập toàn chương trình. 
 •	Việc thay đổi các joint point của một chương trình mà không được lường trước bởi người viết aspect sẽ gây ra các lỗi. 
 •	Vấn đề bảo mật có thể bị phá vỡ bởi việc sử dụng AOP để cài thêm các đoạn mã tại các vị trí phù hợp. 
+Chương 2 – Công cụ kiểm chứng mô hình Java PathFinder
+2.1. Giới thiệu
+Các kỹ thuật kiểm chứng hệ thống đang được áp dụng để thiết kế các hệ thống phần mềm ngày
+càng trở nên đáng tin cậy hơn. Kiểm chứng mô hình [4] là một kỹ thuật tự động để kiểm chứng các hệ
+thống tương tranh hữu hạn trạng thái được phát triển độc lập bởi Clarke và Emerson tại Mỹ và Queille
+và Sifakis tại Pháp vào những năm 1980.
+Trong khi việc kiểm chứng mô hình phần mềm về lý thuyết nghe có vẻ là phương pháp kiểm
+chứng an toàn và mạnh, thực tế chỉ ra rằng nó không thực sự mạnh. Để làm cho phương pháp này thực
+tế hơn, một công cụ kiểm chứng mô hình phải tận dụng các giải pháp kinh nghiệm và trừu tượng hóa
+trạng thái linh hoạt. Java PathFinder (JPF) [19, 25, 30, 31] là công cụ độc nhất vô nhị về khả năng cấu
+hình và khả năng mở rộng và vì vậy nó là một nền tảng tốt để khám phá các cách mới để cải thiện hiệu
+năng.
+2.2. Công cụ kiểm chứng mô hình Java PathFinder
+Java PathFinder (JPF) [19, 25, 30, 31] là một hệ thống để kiểm chứng mã thực thi bytecode của
+các chương trình Java. Ở dạng đơn giản, nó là một máy ảo Java được sử dụng như một công cụ kiểm
+chứng mô hình trạng thái phần mềm tường minh, khảo sát tất cả các đường thực thi tiềm năng của một
+chương trình để tìm ra các vi phạm của các thuộc tính như khóa chết (deadlock) hay các ngoại lệ
+không được xử lý (unhanled exceptions). Không giống như các công cụ gỡ lỗi truyền thống, JPF thông
+báo đầy đủ đường thực thi dẫn đến một một lỗi. JPF đặc biệt rất phù hợp cho việc tìm kiếm các lỗi rất
+khó kiểm thử trong các chương trình đa luồng.
+2.2.1. Lịch sử của Java PathFinder
+JPF hoàn toàn là một chương trình Java có thể được chạy như là một công cụ dòng lệnh độc lập
+hoặc được nhúng vào các hệ thống khác như các môi trường phát triển. Năm 1999 : JPF1 là Java-toPromela,
+năm 2000: JPF2 là công cụ kiểm chứng mô hình được tùy biến có thể hiểu mã bytecode của
+Java và sử dụng mã bytecode một cách trực tiếp, năm 2003: thiết kế và thực thi cấu trúc mở rộng,
+năm 2005: mã nguồn của JPF được mở ra cho cộng đồng phát triển, năm 2006: JPF4 với bộ sinh hợp
+nhất và máy thực thi mới. 
+8
+2.2.2. Các thành phần của Java PathFinder
+Java, ngoài chức năng là một ngôn ngữ lập trình nó còn là một tập các tầng bắt đầu bằng một
+nền thực thi máy ảo cụ thể (“VM chủ”) nằm trên đỉnh của các thư viện thực thi (native libraries) được
+viết cho hệ điều hành. Đối với ngăn xếp này, chúng ta thêm JPF – một ứng dụng Java để chạy trên
+đỉnh của máy ảo chủ, nhưng bản thân nó là một máy áo (VM) mà sau đó thực thi hệ thống được kiểm
+thử (System Under Test – SUT).
+2.2.3. Những gì có thể được kiểm chứng bởi Java PathFinder
+Java có thể tìm các lỗi khóa chết (deadlock) và các ngoại lệ không được xử lý (unhandled
+exception) như NullPointerExceptions và AssertionErrors, tuy nhiên người dùng còn có thể tự cung
+cấp các lớp hoặc viết các phần mở rộng để thực hiện kiểm chứng các thuộc tính khác. Các kiểm tra
+điều kiện tranh chấp (race condition) và các giới hạn bộ nhớ heap (heap bound) cũng được gói trong
+bản phân phối của JPF. JPF có khả năng kiểm chứng mọi chương trình Java không phụ thuộc vào các
+phương thức không được hỗ trợ nội tại.
+2.2.4. Kiểm chứng mô hình trong Java PathFinder
+Đối lập với kiểm thử chỉ thực hiện một đường với một dữ liệu đầu vào, JPF có thể thực hiện mô
+phỏng không tất định (non-determinism). Mô phỏng không tất định yêu cầu hệ thống sinh tất cả các
+lựa chọn có thể cho tất cả các trạng thái của hệ thống. Hệ thống này có hai khả năng: backtracking và
+state matching. Hai cách để tạo ra mô phỏng không tất định trong JPF là quay lui (backtracking) và so
+khớp trạng thái (state matching).
+2.3. Các đề án mở rộng của Java PathFinder
+JPF là một nền tảng có thể mở rộng được. Do đó nhiều dự án đã được triển khai nhằm mở rộng
+những tính năng cho JPF. Hiện tại, các mở rộng của JPF bao gồm: kiểm chứng mô hình giao diện
+người dùng (User Interface Model Checking), sinh dữ liệu kiểm thử ký hiệu (Symbolic Test Data
+Generation), sinh kiểm thử luồng an toàn ký hiệu (Symbolic Threadsafety Test Generation), khung
+làm việc kiểm chứng cấu thành (Compositional Verification Framework), kiểm chứng đặc tính số
+(Numeric Property Verification), kiểm chứng mô hình biểu đồ trạng thái UML (UML State Chart
+Model Checking)
+2.4.Kết luận
+Java Path Finder (JPF) là một hệ thống để kiểm chứng các chương trình bytecode của Java thực
+thi được. Nó là một máy ảo Java được sử dụng như là một công cụ kiểm chứng mô hình phần mềm
+trạng thái tường minh. JPF sẽ duyệt một cách có hệ thống tất cả các đường dẫn thực thi tiềm tàng của
+một chương trình để tìm các vi phạm các đặc tính như các khóa chết (deadlock) hay các ngoại lệ
+không được xử lý (unhandled exception). JPF là một hệ thống mở được cấu thành bởi các thành phần.
+Do đó chúng ta hoàn toàn có thể bổ sung thêm các tính năng mới cho JPF dưới dạng các thành phần
+mở rộng. 
+
